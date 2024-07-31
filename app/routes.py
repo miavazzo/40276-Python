@@ -1,5 +1,5 @@
 from flask import request, jsonify, current_app
-from .email_service.py import send_email_with_attachment
+from .email_service import send_email_with_attachment
 
 @current_app.route('/send_email', methods=['POST'])
 def send_email():
