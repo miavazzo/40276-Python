@@ -1,4 +1,5 @@
 from flask import request, jsonify, current_app
+import base64
 from .email_service import send_email_with_attachment
 
 @current_app.route('/send_email', methods=['POST'])
