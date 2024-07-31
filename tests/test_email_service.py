@@ -1,24 +1,40 @@
-# tests/test_email_service.py
-
 import unittest
-from app.email_service import send_email_with_attachment
+from unittest.mock import patch, MagicMock
+import app.email_service as email_service
 
 class TestEmailService(unittest.TestCase):
-    def test_send_email_without_attachment(self):
-        result = send_email_with_attachment("Test Subject", "Test Body", "test@example.com")
-        self.assertIn("status", result)
-        self.assertIn("request", result)
-        self.assertIn("response", result)
-    
-    def test_send_email_with_attachment(self):
-        # Assicurati che il file di test esista
-        attachment_path = "tests/testfile.txt"
-        with open(attachment_path, "w") as f:
-            f.write("This is a test file.")
-        result = send_email_with_attachment("Test Subject", "Test Body", "test@example.com", attachment_path)
-        self.assertIn("status", result)
-        self.assertIn("request", result)
-        self.assertIn("response", result)
+
+    @patch('app.email_service.requests.post')
+    def test_send_email_with_attachments_success(self, mock_post):
+        mock_post.return_value.status_code = 202
+        mock_post.return_value.json.return_value = {}
+
+        subject = "Test Email"
+        body = "This is a test email."
+        to_email = "test@example.com"
+        attachments = [{"path": "testfile.txt", "filename": "testfile.txt"}]
+
+        result = email_service.send_email_with_attachments(subject, body, to_email, attachments)
+        self.assertEqual(result["status"], "Email inviata con successo!")
+
+    @patch('app.email_service.requests.post')
+    def test_send_email_with_attachments_failure(self, mock_post):
+        mock_post.return_value.status_code = 400
+        mock_post.return_value.json.return_value = {"error": "BadRequest"}
+
+        subject = "Test Email"
+        body = "This is a test email."
+        to_email = "test@example.com"
+        attachments = [{"path": "testfile.txt", "filename": "testfile.txt"}]
+
+        result = email_service.send_email_with_attachments(subject, body, to_email, attachments)
+        self.assertIn("Errore nell'invio dell'email.", result["status"])
+
+    def test_get_access_token_failure(self):
+        with patch('app.email_service.ConfidentialClientApplication.acquire_token_for_client', return_value={"error": "invalid_client"}) as mock_acquire:
+            token = email_service.get_access_token()
+            self.assertIsNone(token[0])
+            self.assertEqual(token[1]['error'], "invalid_client")
 
 if __name__ == '__main__':
     unittest.main()

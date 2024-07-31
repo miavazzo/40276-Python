@@ -8,7 +8,7 @@ client_id = os.environ.get('CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
 tenant_id = os.environ.get('TENANT_ID')
 authority = f'https://login.microsoftonline.com/{tenant_id}'
-scopes = ['https://graph.microsoft.com/.default']
+scopes = ['https://graph.microsoftonline.com/.default']
 username = os.environ.get('APP_USERNAME')
 API_KEY = os.environ.get('API_KEY')
 
@@ -61,7 +61,7 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
         for attachment in attachments:
             with open(attachment['path'], 'rb') as file:
                 attachment_content = base64.b64encode(file.read()).decode('utf-8')
-            attachment_name = os.path.basename(attachment['path'])
+            attachment_name = attachment.get('filename', os.path.basename(attachment['path']))
             content_type, _ = mimetypes.guess_type(attachment['path'])
             if not content_type:
                 content_type = 'application/octet-stream'

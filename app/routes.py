@@ -21,7 +21,7 @@ def send_email():
         attachment_path = f"attachment_{attachments.index(attachment)}"
         with open(attachment_path, "wb") as f:
             f.write(base64.b64decode(attachment['content']))
-        saved_attachments.append({"path": attachment_path})
+        saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
     result = send_email_with_attachments(subject, body, to_email, saved_attachments)
 
