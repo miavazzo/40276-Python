@@ -1,6 +1,7 @@
 from flask import request, jsonify, current_app
 import base64
-from .email_service import send_email_with_attachment
+import os
+from .email_service import send_email_with_attachments
 
 @current_app.route('/send_email', methods=['POST'])
 def send_email():
@@ -12,15 +13,20 @@ def send_email():
     subject = data.get('subject')
     body = data.get('body')
     to_email = data.get('to_email')
-    attachment = data.get('attachment', None)
+    attachments = data.get('attachments', [])
 
-    if attachment:
-        attachment_path = "attachment"
+    # Salva temporaneamente gli allegati
+    saved_attachments = []
+    for attachment in attachments:
+        attachment_path = f"attachment_{attachments.index(attachment)}"
         with open(attachment_path, "wb") as f:
-            f.write(base64.b64decode(attachment))
-    else:
-        attachment_path = None
+            f.write(base64.b64decode(attachment['content']))
+        saved_attachments.append({"path": attachment_path})
 
-    result = send_email_with_attachment(subject, body, to_email, attachment_path)
+    result = send_email_with_attachments(subject, body, to_email, saved_attachments)
+
+    # Rimuovi i file temporanei
+    for attachment in saved_attachments:
+        os.remove(attachment["path"])
 
     return jsonify(result), 200

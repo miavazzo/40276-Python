@@ -27,7 +27,7 @@ def get_access_token():
     else:
         return None, result
 
-def send_email_with_attachment(subject, body, to_email, attachment_path=None):
+def send_email_with_attachments(subject, body, to_email, attachments=None):
     access_token = get_access_token()
     if not access_token:
         return {"error": "Impossibile ottenere il token di accesso."}
@@ -52,25 +52,25 @@ def send_email_with_attachment(subject, body, to_email, attachment_path=None):
                     }
                 }
             ],
+            'attachments': []
         },
         'saveToSentItems': 'true'
     }
 
-    if attachment_path:
-        with open(attachment_path, 'rb') as file:
-            attachment_content = base64.b64encode(file.read()).decode('utf-8')
-        attachment_name = os.path.basename(attachment_path)
-        content_type, _ = mimetypes.guess_type(attachment_path)
-        if not content_type:
-            content_type = 'application/octet-stream'
-        email_msg['message']['attachments'] = [
-            {
+    if attachments:
+        for attachment in attachments:
+            with open(attachment['path'], 'rb') as file:
+                attachment_content = base64.b64encode(file.read()).decode('utf-8')
+            attachment_name = os.path.basename(attachment['path'])
+            content_type, _ = mimetypes.guess_type(attachment['path'])
+            if not content_type:
+                content_type = 'application/octet-stream'
+            email_msg['message']['attachments'].append({
                 '@odata.type': '#microsoft.graph.fileAttachment',
                 'name': attachment_name,
                 'contentType': content_type,
                 'contentBytes': attachment_content
-            }
-        ]
+            })
 
     print("Request:")
     print(f"URL: {endpoint}")
@@ -104,4 +104,3 @@ def send_email_with_attachment(subject, body, to_email, attachment_path=None):
         result["status"] = f"Errore nell'invio dell'email. Codice di stato: {response.status_code}"
 
     return result
-
