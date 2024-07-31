@@ -4,3 +4,10 @@ file_path = r'C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. 40276 parametr
 with open(file_path, 'rb') as file:
     encoded_string = base64.b64encode(file.read()).decode('utf-8')
     print(encoded_string)
+
+input("Premi Enter per continuare...")
+
+file_path = r'C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. 40276 parametri email portale clienti - fatture Newatt\Crypto101.pdf'
+with open(file_path, 'rb') as file:
+    encoded_string = base64.b64encode(file.read()).decode('utf-8')
+    print(encoded_string)
