@@ -9,7 +9,7 @@ client_secret = os.environ.get('CLIENT_SECRET')
 tenant_id = os.environ.get('TENANT_ID')
 authority = f'https://login.microsoftonline.com/{tenant_id}'
 scopes = ['https://graph.microsoft.com/.default']
-username = os.environ.get('USERNAME')
+username = os.environ.get('APP_USERNAME')
 API_KEY = os.environ.get('API_KEY')
 
 def get_access_token():
@@ -72,7 +72,17 @@ def send_email_with_attachment(subject, body, to_email, attachment_path=None):
             }
         ]
 
+    print("Request:")
+    print(f"URL: {endpoint}")
+    print(f"Headers: {headers}")
+    print(f"Email Message: {email_msg}")
+
     response = requests.post(endpoint, headers=headers, json=email_msg)
+
+    print("Response:")
+    print(f"Status Code: {response.status_code}")
+    print(f"Headers: {response.headers}")
+    print(f"Body: {response.text}")
 
     result = {
         "request": {
@@ -94,3 +104,4 @@ def send_email_with_attachment(subject, body, to_email, attachment_path=None):
         result["status"] = f"Errore nell'invio dell'email. Codice di stato: {response.status_code}"
 
     return result
+
