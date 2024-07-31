@@ -25,11 +25,12 @@ def get_access_token():
     if "access_token" in result:
         return result['access_token']
     else:
-        return None, result
+        return None
 
 def send_email_with_attachments(subject, body, to_email, attachments=None):
     access_token = get_access_token()
     if not access_token:
+        print("Debug: Impossibile ottenere il token di accesso.")
         return {"error": "Impossibile ottenere il token di accesso."}
 
     endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
@@ -72,17 +73,14 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
                 'contentBytes': attachment_content
             })
 
-    print("Request:")
-    print(f"URL: {endpoint}")
-    print(f"Headers: {headers}")
-    print(f"Email Message: {email_msg}")
+    print("Debug: Sending email with the following message:")
+    print(email_msg)
 
     response = requests.post(endpoint, headers=headers, json=email_msg)
 
-    print("Response:")
+    print("Debug: Received response:")
     print(f"Status Code: {response.status_code}")
-    print(f"Headers: {response.headers}")
-    print(f"Body: {response.text}")
+    print(f"Response Body: {response.text}")
 
     result = {
         "request": {
@@ -102,5 +100,8 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
         result["status"] = "Email inviata con successo!"
     else:
         result["status"] = f"Errore nell'invio dell'email. Codice di stato: {response.status_code}"
+
+    print("Debug: Result after sending email:")
+    print(result)
 
     return result
