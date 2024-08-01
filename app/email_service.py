@@ -1,7 +1,21 @@
+"""
+This module provides functionality to send emails with optional attachments 
+using the Microsoft Graph API.
+
+Environment Variables:
+    CLIENT_ID (str): The client ID for the Microsoft application.
+    CLIENT_SECRET (str): The client secret for the Microsoft application.
+    TENANT_ID (str): The tenant ID for the Microsoft application.
+    APP_USERNAME (str): The username for the application.
+    API_KEY (str): The API key for the application.
+
+Functions:
+    get_access_token(): Retrieves an access token from Microsoft Identity platform.
+"""
 import os
-import requests
-import base64
 import mimetypes
+import base64
+import requests
 from msal import ConfidentialClientApplication
 
 client_id = os.environ.get('CLIENT_ID')
@@ -13,6 +27,16 @@ username = os.environ.get('APP_USERNAME')
 API_KEY = os.environ.get('API_KEY')
 
 def get_access_token():
+    """
+    Retrieves an access token from the Microsoft Identity platform.
+
+    This function uses the client credentials flow to obtain an access token
+    for the Microsoft Graph API. It requires the CLIENT_ID, CLIENT_SECRET, 
+    and TENANT_ID environment variables to be set.
+
+    Returns:
+        str: The access token required for authenticating API requests.
+    """
     app = ConfidentialClientApplication(
         client_id,
         authority=authority,
@@ -32,6 +56,19 @@ def get_access_token():
         return None
 
 def send_email_with_attachments(subject, body, to_email, attachments=None):
+    """
+    Sends an email with optional attachments using Microsoft Graph API.
+
+    Args:
+        subject (str): The subject of the email.
+        body (str): The body content of the email.
+        to_email (str): The recipient's email address.
+        attachments (list, optional): A list of file paths to attach to the email. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing the result of the email sending operation. 
+              If an error occurs, it contains an error message.
+    """
     access_token = get_access_token()
     if not access_token:
         print("Debug: Impossibile ottenere il token di accesso.")
@@ -80,7 +117,7 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
     print("Debug: Sending email with the following message:")
     print(email_msg)
 
-    response = requests.post(endpoint, headers=headers, json=email_msg)
+    response = requests.post(endpoint, headers=headers, json=email_msg, timeout=10)
 
     print("Debug: Received response:")
     print(f"Status Code: {response.status_code}")
