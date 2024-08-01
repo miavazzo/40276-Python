@@ -8,7 +8,7 @@ client_id = os.environ.get('CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
 tenant_id = os.environ.get('TENANT_ID')
 authority = f'https://login.microsoftonline.com/{tenant_id}'
-scopes = ['https://graph.microsoftonline.com/.default']
+scopes = ['https://graph.microsoft.com/.default']
 username = os.environ.get('APP_USERNAME')
 API_KEY = os.environ.get('API_KEY')
 
@@ -21,10 +21,14 @@ def get_access_token():
     result = app.acquire_token_silent(scopes, account=None)
     if not result:
         result = app.acquire_token_for_client(scopes=scopes)
+        print("Debug: Result from acquire_token_for_client:")
+        print(result)
 
     if "access_token" in result:
         return result['access_token']
     else:
+        print("Debug: Failed to get access token.")
+        print(result)
         return None
 
 def send_email_with_attachments(subject, body, to_email, attachments=None):
@@ -33,7 +37,7 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
         print("Debug: Impossibile ottenere il token di accesso.")
         return {"error": "Impossibile ottenere il token di accesso."}
 
-    endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
+    endpoint = f'https://graph.microsoftonline.com/v1.0/users/{username}/sendMail'
     headers = {
         'Authorization': 'Bearer ' + access_token,
         'Content-Type': 'application/json'
