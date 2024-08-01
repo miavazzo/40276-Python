@@ -17,6 +17,7 @@ Functions:
         Tests the successful sending of an email with attachments.
 """
 import unittest
+import os
 from unittest.mock import patch
 from dotenv import load_dotenv
 import app.email_service as email_service
@@ -39,7 +40,7 @@ class TestEmailService(unittest.TestCase):
     """
     @patch('app.email_service.get_access_token', return_value="fake_access_token")
     @patch('app.email_service.requests.post')
-    def test_send_email_with_attachments_success(self, mock_post):
+    def test_send_email_with_attachments_success(self, mock_post, mock_get_access_token):
         """
         Sets up the test environment by loading environment variables.
 
@@ -104,7 +105,7 @@ class TestEmailService(unittest.TestCase):
 
     @patch('app.email_service.get_access_token', return_value="fake_access_token")
     @patch('app.email_service.requests.post')
-    def test_send_email_with_attachments_failure(self, mock_post):
+    def test_send_email_with_attachments_failure(self, mock_post, mock_get_access_token):
         """
         Tests the successful sending of an email with attachments.
 
@@ -174,7 +175,7 @@ class TestEmailService(unittest.TestCase):
         'app.email_service.ConfidentialClientApplication.acquire_token_for_client', 
         return_value={"error": "invalid_client"}
     )
-    def test_get_access_token_failure(self):
+    def test_get_access_token_failure(self, mock_acquire_token):
         """
         Tests the failure scenario when retrieving an access token.
 
@@ -186,8 +187,13 @@ class TestEmailService(unittest.TestCase):
             mock_acquire_token (unittest.mock.Mock): Mock object for the 
             acquire_token_for_client method.
         """
-        token = email_service.get_access_token()
-        self.assertIsNone(token)
+        # Mock the authority variable
+        with patch(
+            'app.email_service.authority', 
+            new=f"https://login.microsoftonline.com/{os.getenv('TENANT_ID')}"
+            ):
+            token = email_service.get_access_token()
+            self.assertIsNone(token)
 
 if __name__ == '__main__':
     unittest.main()
