@@ -21,11 +21,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client_id = os.getenv('CLIENT_IDS') #os.environ.get('CLIENT_ID')
+client_id = os.getenv('CLIENT_ID') #os.environ.get('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET') #os.environ.get('CLIENT_SECRET')
-tenant_id = os.getenv('TENANT_IDS') #os.environ.get('TENANT_ID')
+tenant_id = os.getenv('TENANT_ID') #os.environ.get('TENANT_ID')
 authority = f'https://login.microsoftonline.com/{tenant_id}'
-scopes = ['https://graph.microsoftonline.com/.default']
+scopes = ['https://graph.microsoft.com/.default']
 username = os.getenv('APP_USERNAME') #os.environ.get('APP_USERNAME')
 API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
 

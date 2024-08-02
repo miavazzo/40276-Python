@@ -51,14 +51,14 @@ class TestEmailService(unittest.TestCase):
         mock_post.return_value.status_code = 202
         mock_post.return_value.json.return_value = {}
 
-        subject = "40276-Test Email"
+        subject = "40240-Test Email"
         body = "This is a test email."
         to_email = "massimiliano.iavazzo@capgemini.com"
         attachments = [
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T"
-                    r". 40276 parametri email portale clienti - "
+                    r". 40240 parametri email portale clienti - "
                     r"fatture Newatt\Crypto101.pdf"
                 ),
                 "filename": "Crypto101.pdf"
@@ -66,7 +66,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T." 
-                    r" 40276 parametri email portale clienti - "
+                    r" 40240 parametri email portale clienti - "
                     r"fatture Newatt\Form-Argon-Design-Form.pdf"
                 ),
                 "filename": "Form-Argon-Design-Form.pdf"
@@ -74,7 +74,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T." 
-                    r" 40276 parametri email portale clienti - "
+                    r" 40240 parametri email portale clienti - "
                     r"fatture Newatt\test1.docx"
                 ),
                 "filename": "test1.docx"
@@ -82,7 +82,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\test2.docx"
                 ),
                 "filename": "test2.docx"
@@ -90,7 +90,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\test3.docx"
                 ),
                 "filename": "test3.docx"
@@ -119,14 +119,14 @@ class TestEmailService(unittest.TestCase):
         mock_post.return_value.status_code = 400
         mock_post.return_value.json.return_value = {"error": "BadRequest"}
 
-        subject = "40276-Test Email"
+        subject = "40240-Test Email"
         body = "This is a test email."
         to_email = "massimiliano.iavazzo@capgemini.com"
         attachments = [
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T"
-                    r". 40276 parametri email portale clienti - "
+                    r". 40240 parametri email portale clienti - "
                     r"fatture Newatt\Crypto101.pdf"
                 ),
                 "filename": "Crypto101.pdf"
@@ -134,7 +134,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\Form-Argon-Design-Form.pdf"
                 ),
                 "filename": "Form-Argon-Design-Form.pdf"
@@ -142,7 +142,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\test1.docx"
                 ),
                 "filename": "test1.docx"
@@ -150,7 +150,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\test2.docx"
                 ),
                 "filename": "test2.docx"
@@ -158,7 +158,7 @@ class TestEmailService(unittest.TestCase):
             {
                 "path": (
                     r"C:\Users\miavazzo\OneDrive - Capgemini\Documents\T. "
-                    r"40276 parametri email portale clienti - "
+                    r"40240 parametri email portale clienti - "
                     r"fatture Newatt\test3.docx"
                 ),
                 "filename": "test3.docx"
