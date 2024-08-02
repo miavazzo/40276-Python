@@ -17,14 +17,17 @@ import mimetypes
 import base64
 import requests
 from msal import ConfidentialClientApplication
+from dotenv import load_dotenv
 
-client_id = os.environ.get('CLIENT_ID')
-client_secret = os.environ.get('CLIENT_SECRET')
-tenant_id = os.environ.get('TENANT_ID')
+load_dotenv()
+
+client_id = os.getenv('CLIENT_ID') #os.environ.get('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET') #os.environ.get('CLIENT_SECRET')
+tenant_id = os.getenv('TENANT_ID') #os.environ.get('TENANT_ID')
 authority = f'https://login.microsoftonline.com/{tenant_id}'
-scopes = ['https://graph.microsoft.com/.default']
-username = os.environ.get('APP_USERNAME')
-API_KEY = os.environ.get('API_KEY')
+scopes = ['https://graph.microsoftonline.com/.default']
+username = os.getenv('APP_USERNAME') #os.environ.get('APP_USERNAME')
+API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
 
 def get_access_token():
     """
