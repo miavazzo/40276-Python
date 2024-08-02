@@ -77,7 +77,7 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
         print("Debug: Impossibile ottenere il token di accesso.")
         return {"error": "Impossibile ottenere il token di accesso."}
 
-    endpoint = f'https://graph.microsoftonline.com/v1.0/users/{username}/sendMail'
+    endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
     headers = {
         'Authorization': 'Bearer ' + access_token,
         'Content-Type': 'application/json'
