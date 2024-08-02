@@ -58,7 +58,7 @@ def get_access_token():
         print(result)
         return None
 
-def send_email_with_attachments(subject, body, to_email, attachments=None):
+def send_email_with_attachments(subject, body, to_emails, attachments=None):
     """
     Sends an email with optional attachments using Microsoft Graph API.
 
@@ -83,6 +83,8 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
         'Content-Type': 'application/json'
     }
 
+    to_recipients = [{"emailAddress": {"address": email}} for email in to_emails]
+
     email_msg = {
         'message': {
             'subject': subject,
@@ -90,13 +92,7 @@ def send_email_with_attachments(subject, body, to_email, attachments=None):
                 'contentType': 'Text',
                 'content': body
             },
-            'toRecipients': [
-                {
-                    'emailAddress': {
-                        'address': to_email
-                    }
-                }
-            ],
+            'toRecipients': to_recipients,
             'attachments': []
         },
         'saveToSentItems': 'true'

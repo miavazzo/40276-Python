@@ -1,10 +1,16 @@
-from flask import request, jsonify, current_app
+'''
+file di smistaggio delle richieste in ingresso alle varie rotte dell'API
+'''
 import base64
 import os
+from flask import request, jsonify, current_app
 from .email_service import send_email_with_attachments
 
 @current_app.route('/send_email', methods=['POST'])
 def send_email():
+    '''
+    rotta principale dell'API per l'invio di email
+    '''
     api_key = request.headers.get('x-api-key')
     if api_key != current_app.config['API_KEY']:
         return jsonify({"error": "Unauthorized"}), 401
@@ -12,7 +18,7 @@ def send_email():
     data = request.json
     subject = data.get('subject')
     body = data.get('body')
-    to_email = data.get('to_email')
+    to_emails = data.get('to_emails')
     attachments = data.get('attachments', [])
 
     # Salva temporaneamente gli allegati
@@ -23,7 +29,7 @@ def send_email():
             f.write(base64.b64decode(attachment['content']))
         saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
-    result = send_email_with_attachments(subject, body, to_email, saved_attachments)
+    result = send_email_with_attachments(subject, body, to_emails, saved_attachments)
 
     # Rimuovi i file temporanei
     for attachment in saved_attachments:
