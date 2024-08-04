@@ -15,29 +15,32 @@ Functions:
 import base64
 import os
 import mimetypes
-import requests
 from msal import ConfidentialClientApplication
+import requests
 
 def get_access_token(client_id, client_secret, tenant_id):
-    authority = f'https://login.microsoftonline.com/{tenant_id}'
-    app = ConfidentialClientApplication(
-        client_id,
-        authority=authority,
-        client_credential=client_secret  # Assicurati che client_secret sia una stringa e non un dizionario
-    )
-    result = app.acquire_token_silent(scopes=['https://graph.microsoft.com/.default'], account=None)
-    if not result:
-        result = app.acquire_token_for_client(scopes=['https://graph.microsoft.com/.default'])
+    try:
+        authority = f'https://login.microsoftonline.com/{tenant_id}'
+        app = ConfidentialClientApplication(
+            client_id,
+            authority=authority,
+            client_credential=client_secret
+        )
+        result = app.acquire_token_silent(scopes=['https://graph.microsoft.com/.default'], account=None)
+        if not result:
+            result = app.acquire_token_for_client(scopes=['https://graph.microsoft.com/.default'])
 
-    if "access_token" in result:
-        return result['access_token'], None
-    else:
-        return None, result.get("error_description")
+        if "access_token" in result:
+            return result['access_token'], None
+        else:
+            return None, result.get("error_description", "Unknown error")
+    except Exception as e:
+        return None, str(e)
 
 def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, attachments=None):
     access_token, error_description = get_access_token(client_id, client_secret, tenant_id)
     if not access_token:
-        return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 500
+        return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 401
 
     endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
     headers = {
