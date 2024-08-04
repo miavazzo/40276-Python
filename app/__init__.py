@@ -2,14 +2,17 @@
 Inizialization script for the app
 '''
 from flask import Flask
+from .config import Config
+from .routes import bp as email_bp
 
 def create_app():
     '''
-    Inizialization script for the app
+    initialize the app
     '''
     app = Flask(__name__)
-    app.config.from_object('app.config.Config')
+    app.config.from_object(Config)
 
-    with app.app_context():
-        from . import routes
-        return app
+    app.register_blueprint(email_bp)
+
+    return app
+
