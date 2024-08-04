@@ -2,8 +2,8 @@
 file per startare l'applicazione
 '''
 from app import create_app
-from dotenv import load_dotenv
-import os
+#from dotenv import load_dotenv
+#import os
 
 #load_dotenv()
 
