@@ -24,24 +24,18 @@ def send_email():
     to_emails = data.get('to_emails')
     attachments = data.get('attachments', [])
 
-    # Verifica che tutti i parametri necessari siano presenti
     if not all([client_id, client_secret, tenant_id, username, subject, body, to_emails]):
         return jsonify({"error": "Missing required parameters"}), 400
 
-    # Salva temporaneamente gli allegati
     saved_attachments = []
     for attachment in attachments:
-        try:
-            attachment_path = f"attachment_{attachments.index(attachment)}"
-            with open(attachment_path, "wb") as f:
-                f.write(base64.b64decode(attachment['content']))
-            saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
-        except base64.binascii.Error:
-            return jsonify({"error": "Invalid base64 attachment"}), 400
+        attachment_path = f"attachment_{attachments.index(attachment)}"
+        with open(attachment_path, "wb") as f:
+            f.write(base64.b64decode(attachment['content']))
+        saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
     result, status_code = send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, saved_attachments)
 
-    # Rimuovi i file temporanei
     for attachment in saved_attachments:
         os.remove(attachment["path"])
 

@@ -12,34 +12,32 @@ Environment Variables:
 Functions:
     get_access_token(): Retrieves an access token from Microsoft Identity platform.
 """
-import os
-import requests
 import base64
+import os
 import mimetypes
+import requests
 from msal import ConfidentialClientApplication
 
 def get_access_token(client_id, client_secret, tenant_id):
     authority = f'https://login.microsoftonline.com/{tenant_id}'
-    scopes = ['https://graph.microsoft.com/.default']
-
     app = ConfidentialClientApplication(
         client_id,
         authority=authority,
-        client_credential={"client_secret": client_secret}
+        client_credential=client_secret  # Assicurati che client_secret sia una stringa e non un dizionario
     )
-    result = app.acquire_token_silent(scopes, account=None)
+    result = app.acquire_token_silent(scopes=['https://graph.microsoft.com/.default'], account=None)
     if not result:
-        result = app.acquire_token_for_client(scopes=scopes)
+        result = app.acquire_token_for_client(scopes=['https://graph.microsoft.com/.default'])
 
     if "access_token" in result:
         return result['access_token'], None
     else:
-        return None, result.get('error_description', 'Unknown error')
+        return None, result.get("error_description")
 
 def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, attachments=None):
     access_token, error_description = get_access_token(client_id, client_secret, tenant_id)
     if not access_token:
-        return {"error": "Unauthorized", "description": error_description}, 401
+        return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 500
 
     endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
     headers = {
@@ -60,20 +58,10 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
         'saveToSentItems': 'true'
     }
 
-    for email in to_emails:
-        if '@' not in email:
-            return {"error": "Invalid recipient email"}, 400
-
     if attachments:
         for attachment in attachments:
-            try:
-                with open(attachment['path'], 'rb') as file:
-                    attachment_content = base64.b64encode(file.read()).decode('utf-8')
-            except (FileNotFoundError, IOError) as e:
-                return {"error": f"Error reading file {attachment['path']}: {str(e)}"}, 400
-            except base64.binascii.Error:
-                return {"error": "Invalid base64 attachment"}, 400
-
+            with open(attachment['path'], 'rb') as file:
+                attachment_content = base64.b64encode(file.read()).decode('utf-8')
             attachment_name = attachment.get('filename', os.path.basename(attachment['path']))
             content_type, _ = mimetypes.guess_type(attachment['path'])
             if not content_type:
@@ -85,28 +73,8 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
                 'contentBytes': attachment_content
             })
 
-    try:
-        response = requests.post(endpoint, headers=headers, json=email_msg, timeout=10)
-    except requests.exceptions.RequestException as e:
-        return {"error": f"Network error: {str(e)}"}, 500
-
-    result = {
-        "request": {
-            "method": "POST",
-            "url": endpoint,
-            "headers": headers,
-            "body": "[CONTENUTO OMESSO PER BREVITÀ]"
-        },
-        "response": {
-            "status_code": response.status_code,
-            "headers": dict(response.headers),
-            "body": response.text
-        }
-    }
-
+    response = requests.post(endpoint, headers=headers, json=email_msg)
     if response.status_code == 202:
-        result["status"] = "Email inviata con successo!"
+        return {"status": "Email inviata con successo!"}, 202
     else:
-        result["status"] = f"Errore nell'invio dell'email. Codice di stato: {response.status_code}"
-
-    return result, response.status_code
+        return {"error": f"Errore nell'invio dell'email. Codice di stato: {response.status_code}", "response": response.json()}, response.status_code
