@@ -1,5 +1,11 @@
 import unittest
-import json
+import os
+import sys
+
+# Aggiungi il percorso dell'applicazione alla sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from flask import json
 from app import create_app
 
 class TestMissingApiKey(unittest.TestCase):
@@ -8,16 +14,21 @@ class TestMissingApiKey(unittest.TestCase):
         self.client = self.app.test_client()
 
     def test_missing_api_key(self):
-        payload = {
-            "client_id": "your_client_id",
-            "client_secret": "your_client_secret",
-            "tenant_id": "your_tenant_id",
-            "username": "your_username",
+        # Prepara i dati di test
+        data = {
+            "client_id": "valid_client_id",
+            "client_secret": "valid_client_secret",
+            "tenant_id": "valid_tenant_id",
+            "username": "valid_username",
             "subject": "Test Subject",
             "body": "Test Body",
-            "to_emails": ["test@example.com"]
+            "to_emails": ["valid@example.com"]
         }
-        response = self.client.post('/send_email', json=payload)
+
+        # Effettua la richiesta senza la chiave API
+        response = self.client.post('/send_email', data=json.dumps(data), content_type='application/json')
+        
+        # Verifica che la risposta sia 401 Unauthorized
         self.assertEqual(response.status_code, 401)
 
 if __name__ == '__main__':
