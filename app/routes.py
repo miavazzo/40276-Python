@@ -16,10 +16,18 @@ def send_email():
         return jsonify({"error": "Unauthorized"}), 401
 
     data = request.json
+    client_id = data.get('client_id')
+    client_secret = data.get('client_secret')
+    tenant_id = data.get('tenant_id')
+    username = data.get('username')
     subject = data.get('subject')
     body = data.get('body')
     to_emails = data.get('to_emails')
     attachments = data.get('attachments', [])
+
+    # Verifica che tutti i parametri necessari siano presenti
+    if not all([client_id, client_secret, tenant_id, username, subject, body, to_emails]):
+        return jsonify({"error": "Missing required parameters"}), 400
 
     # Salva temporaneamente gli allegati
     saved_attachments = []
@@ -29,7 +37,7 @@ def send_email():
             f.write(base64.b64decode(attachment['content']))
         saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
-    result = send_email_with_attachments(subject, body, to_emails, saved_attachments)
+    result = send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, saved_attachments)
 
     # Rimuovi i file temporanei
     for attachment in saved_attachments:
