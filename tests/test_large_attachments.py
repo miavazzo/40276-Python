@@ -1,7 +1,16 @@
+# tests/test_large_attachments.py
+
+import os
+import sys
 import unittest
 import json
 import base64
+
+# Aggiungi il percorso dell'applicazione alla sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app import create_app
+from app.config import Config
 
 class TestLargeAttachments(unittest.TestCase):
     def setUp(self):
@@ -9,22 +18,31 @@ class TestLargeAttachments(unittest.TestCase):
         self.client = self.app.test_client()
 
     def test_large_attachments(self):
-        large_content = base64.b64encode(b'a' * 10**7).decode('utf-8')  # 10 MB file
+        # Simula un allegato grande
+        large_content = base64.b64encode(os.urandom(10 * 1024 * 1024)).decode('utf-8')  # 10 MB
         payload = {
-            "client_id": "your_client_id",
-            "client_secret": "your_client_secret",
-            "tenant_id": "your_tenant_id",
-            "username": "your_username",
-            "subject": "Test Subject",
-            "body": "Test Body",
+            "client_id": Config.CLIENT_ID,
+            "client_secret": Config.CLIENT_SECRET,
+            "tenant_id": Config.TENANT_ID,
+            "username": Config.USERNAME,
+            "subject": "Test Email with Large Attachments",
+            "body": "This is a test email with a large attachment.",
             "to_emails": ["test@example.com"],
-            "attachments": [{
-                "filename": "test.txt",
-                "content": large_content
-            }]
+            "attachments": [
+                {
+                    "filename": "large_file.txt",
+                    "content": large_content
+                }
+            ]
         }
-        response = self.client.post('/send_email', headers={'x-api-key': 'your_api_key'}, json=payload)
+        headers = {
+            "Content-Type": "application/json",
+            "x-api-key": Config.API_KEY
+        }
+        response = self.client.post('/send_email', data=json.dumps(payload), headers=headers)
         self.assertEqual(response.status_code, 202)
+        response_data = json.loads(response.data)
+        self.assertIn("Email inviata con successo!", response_data["status"])
 
 if __name__ == '__main__':
     unittest.main()
