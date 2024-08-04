@@ -17,6 +17,11 @@ import os
 import mimetypes
 from msal import ConfidentialClientApplication
 import requests
+import re
+
+def is_valid_email(email):
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(email_regex, email) is not None
 
 def get_access_token(client_id, client_secret, tenant_id):
     try:
@@ -41,6 +46,10 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
     access_token, error_description = get_access_token(client_id, client_secret, tenant_id)
     if not access_token:
         return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 401
+
+    for email in to_emails:
+        if not is_valid_email(email):
+            return {"error": "Invalid recipient email format"}, 400
 
     endpoint = f'https://graph.microsoft.com/v1.0/users/{username}/sendMail'
     headers = {
