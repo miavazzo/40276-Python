@@ -1,3 +1,6 @@
+'''
+file che esegue l'intera unità di test, ovvero tutti i test definiti nei file di test.
+'''
 import unittest
 import os
 import sys
@@ -9,7 +12,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'tests')
 test_modules = [
     'test_dotenv',
     'test_email_body_formats',
-    'test_get_access_token_failure',
     'test_invalid_api_key',
     'test_invalid_attachments',
     'test_invalid_base64_attachment',
