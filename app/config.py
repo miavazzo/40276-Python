@@ -17,10 +17,16 @@ class Config:
     USERNAME = os.getenv('APP_USERNAME') #os.environ.get('USERNAME')
     API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
 class DevelopmentConfig(Config):
+    '''
+    configurazione per ambiente di sviluppo
+    '''
     DEBUG = True
     ENV = 'development'
 
 class ProductionConfig(Config):
+    '''
+    configurazione per ambiente di produzione
+    '''
     DEBUG = False
     ENV = 'production'
 

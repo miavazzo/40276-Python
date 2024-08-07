@@ -44,8 +44,8 @@ def send_email():
         saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
     result, status_code = send_email_with_attachments(
-        client_id, client_secret, tenant_id, username, subject, 
-        body, to_emails, cc_emails, bcc_emails, saved_attachments, 
+        client_id, client_secret, tenant_id, username, subject,
+        body, to_emails, cc_emails, bcc_emails, saved_attachments,
         is_html
     )
 
