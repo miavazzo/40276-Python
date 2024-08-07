@@ -12,6 +12,10 @@ bp = Blueprint('email', __name__)
 
 @bp.route('/send_email', methods=['POST'])
 def send_email():
+    '''
+    rotta per l'invio di email con allegati. 
+    richiede un API key per l'autenticazione.
+    '''
     api_key = request.headers.get('x-api-key')
     if api_key != current_app.config['API_KEY']:
         return jsonify({"error": "Unauthorized"}), 401
@@ -40,7 +44,9 @@ def send_email():
         saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
     result, status_code = send_email_with_attachments(
-        client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, saved_attachments, is_html
+        client_id, client_secret, tenant_id, username, subject, 
+        body, to_emails, cc_emails, bcc_emails, saved_attachments, 
+        is_html
     )
 
     for attachment in saved_attachments:

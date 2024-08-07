@@ -15,15 +15,22 @@ Functions:
 import base64
 import os
 import mimetypes
+import re
 from msal import ConfidentialClientApplication
 import requests
-import re
 
 def is_valid_email(email):
+    '''
+    funzione di validazione di una email
+    '''
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(email_regex, email) is not None
 
 def get_access_token(client_id, client_secret, tenant_id):
+    '''
+    funzione che gestisce la richiesta di un token di accesso
+    verso il servizio Microsoft Graph
+    '''
     try:
         authority = f'https://login.microsoftonline.com/{tenant_id}'
         app = ConfidentialClientApplication(
@@ -31,7 +38,10 @@ def get_access_token(client_id, client_secret, tenant_id):
             authority=authority,
             client_credential=client_secret
         )
-        result = app.acquire_token_silent(scopes=['https://graph.microsoft.com/.default'], account=None)
+        result = app.acquire_token_silent(
+            scopes=['https://graph.microsoft.com/.default'], 
+            account=None
+        )
         if not result:
             result = app.acquire_token_for_client(scopes=['https://graph.microsoft.com/.default'])
 
@@ -43,6 +53,9 @@ def get_access_token(client_id, client_secret, tenant_id):
         return None, str(e)
 
 def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, attachments=None, is_html=False):
+    '''
+    metodo che implementa l'invio di email con allegati
+    '''
     access_token, error_description = get_access_token(client_id, client_secret, tenant_id)
     if not access_token:
         return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 401
@@ -89,7 +102,7 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
                 'contentBytes': attachment_content
             })
 
-    response = requests.post(endpoint, headers=headers, json=email_msg)
+    response = requests.post(endpoint, headers=headers, json=email_msg, timeout=10)
     if response.status_code == 202:
         return {"status": "Email inviata con successo!"}, 202
     else:
