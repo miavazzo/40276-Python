@@ -52,7 +52,8 @@ def get_access_token(client_id, client_secret, tenant_id):
     except Exception as e:
         return None, str(e)
 
-def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, attachments=None, is_html=False):
+def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, 
+        to_emails, cc_emails, bcc_emails, attachments=None, is_html=False, custom_headers=None):
     '''
     metodo che implementa l'invio di email con allegati
     '''
@@ -82,7 +83,8 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
             'toRecipients': [{'emailAddress': {'address': email}} for email in to_emails],
             'ccRecipients': [{'emailAddress': {'address': email}} for email in cc_emails] if cc_emails else [],
             'bccRecipients': [{'emailAddress': {'address': email}} for email in bcc_emails] if bcc_emails else [],
-            'attachments': []
+            'attachments': [],
+            'internetMessageHeaders': []
         },
         'saveToSentItems': 'true'
     }
@@ -100,6 +102,25 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
                 'name': attachment_name,
                 'contentType': content_type,
                 'contentBytes': attachment_content
+            })
+
+    if custom_headers:
+        for header in custom_headers:
+            name = header['name']
+            value = header['value']
+            # Map standard headers to x- headers
+            if name.lower() == 'date':
+                name = 'x-date'
+            elif name.lower() == 'message-id':
+                name = 'x-message-id'
+            elif name.lower() == 'x-mailer':
+                name = 'X-Mailer'
+            elif name.lower() == 'disposition-notification-to':
+                name = 'X-Disposition-Notification-To'
+
+            email_msg['message']['internetMessageHeaders'].append({
+                'name': name,
+                'value': value
             })
 
     response = requests.post(endpoint, headers=headers, json=email_msg, timeout=10)
