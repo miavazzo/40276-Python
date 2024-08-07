@@ -2,13 +2,6 @@
 This module provides functionality to send emails with optional attachments 
 using the Microsoft Graph API.
 
-Environment Variables:
-    CLIENT_ID (str): The client ID for the Microsoft application.
-    CLIENT_SECRET (str): The client secret for the Microsoft application.
-    TENANT_ID (str): The tenant ID for the Microsoft application.
-    APP_USERNAME (str): The username for the application.
-    API_KEY (str): The API key for the application.
-
 Functions:
     get_access_token(): Retrieves an access token from Microsoft Identity platform.
 """
@@ -39,7 +32,7 @@ def get_access_token(client_id, client_secret, tenant_id):
             client_credential=client_secret
         )
         result = app.acquire_token_silent(
-            scopes=['https://graph.microsoft.com/.default'], 
+            scopes=['https://graph.microsoft.com/.default'],
             account=None
         )
         if not result:
@@ -52,7 +45,10 @@ def get_access_token(client_id, client_secret, tenant_id):
     except Exception as e:
         return None, str(e)
 
-def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, attachments=None, is_html=False):
+def send_email_with_attachments(client_id, client_secret,
+        tenant_id, username, subject, body, to_emails,
+        cc_emails, bcc_emails, attachments=None, is_html=False
+    ):
     '''
     metodo che implementa l'invio di email con allegati
     '''
@@ -80,8 +76,12 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
                 'content': body
             },
             'toRecipients': [{'emailAddress': {'address': email}} for email in to_emails],
-            'ccRecipients': [{'emailAddress': {'address': email}} for email in cc_emails] if cc_emails else [],
-            'bccRecipients': [{'emailAddress': {'address': email}} for email in bcc_emails] if bcc_emails else [],
+            'ccRecipients': [{
+                'emailAddress': {'address': email}
+                } for email in cc_emails] if cc_emails else [],
+            'bccRecipients': [{
+                'emailAddress': {'address': email}
+                } for email in bcc_emails] if bcc_emails else [],
             'attachments': []
         },
         'saveToSentItems': 'true'
@@ -106,4 +106,6 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
     if response.status_code == 202:
         return {"status": "Email inviata con successo!"}, 202
     else:
-        return {"error": f"Errore nell'invio dell'email. Codice di stato: {response.status_code}", "response": response.json()}, response.status_code
+        return {"error": f"Errore nell'invio dell'email. Codice di stato: {response.status_code}",
+                "response": response.json()
+        }, response.status_code
