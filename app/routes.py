@@ -24,7 +24,10 @@ def send_email():
     subject = data.get('subject')
     body = data.get('body')
     to_emails = data.get('to_emails')
+    cc_emails = data.get('cc_emails', [])
+    bcc_emails = data.get('bcc_emails', [])
     attachments = data.get('attachments', [])
+    is_html = data.get('is_html', False)
 
     if not all([client_id, client_secret, tenant_id, username, subject, body, to_emails]):
         return jsonify({"error": "Missing required parameters"}), 400
@@ -36,7 +39,9 @@ def send_email():
             f.write(base64.b64decode(attachment['content']))
         saved_attachments.append({"path": attachment_path, "filename": attachment.get('filename')})
 
-    result, status_code = send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, saved_attachments)
+    result, status_code = send_email_with_attachments(
+        client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, saved_attachments, is_html
+    )
 
     for attachment in saved_attachments:
         os.remove(attachment["path"])
