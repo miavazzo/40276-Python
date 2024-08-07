@@ -18,8 +18,11 @@ class Config:
     API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
 class DevelopmentConfig(Config):
     DEBUG = True
+    ENV = 'development'
+
 class ProductionConfig(Config):
     DEBUG = False
+    ENV = 'production'
 
 config_by_name = {
     'development': DevelopmentConfig,
