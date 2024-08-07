@@ -2,13 +2,6 @@
 This module provides functionality to send emails with optional attachments 
 using the Microsoft Graph API.
 
-Environment Variables:
-    CLIENT_ID (str): The client ID for the Microsoft application.
-    CLIENT_SECRET (str): The client secret for the Microsoft application.
-    TENANT_ID (str): The tenant ID for the Microsoft application.
-    APP_USERNAME (str): The username for the application.
-    API_KEY (str): The API key for the application.
-
 Functions:
     get_access_token(): Retrieves an access token from Microsoft Identity platform.
 """
@@ -39,7 +32,7 @@ def get_access_token(client_id, client_secret, tenant_id):
             client_credential=client_secret
         )
         result = app.acquire_token_silent(
-            scopes=['https://graph.microsoft.com/.default'], 
+            scopes=['https://graph.microsoft.com/.default'],
             account=None
         )
         if not result:
