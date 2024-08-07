@@ -16,3 +16,12 @@ class Config:
     TENANT_ID = os.getenv('TENANT_ID') #os.environ.get('TENANT_ID')
     USERNAME = os.getenv('APP_USERNAME') #os.environ.get('USERNAME')
     API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
+class DevelopmentConfig(Config):
+    DEBUG = True
+class ProductionConfig(Config):
+    DEBUG = False
+
+config_by_name = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig
+}
