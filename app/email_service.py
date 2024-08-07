@@ -42,7 +42,7 @@ def get_access_token(client_id, client_secret, tenant_id):
     except Exception as e:
         return None, str(e)
 
-def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, attachments=None):
+def send_email_with_attachments(client_id, client_secret, tenant_id, username, subject, body, to_emails, cc_emails, bcc_emails, attachments=None, is_html=False):
     access_token, error_description = get_access_token(client_id, client_secret, tenant_id)
     if not access_token:
         return {"error": f"Impossibile ottenere il token di accesso: {error_description}"}, 401
@@ -57,14 +57,18 @@ def send_email_with_attachments(client_id, client_secret, tenant_id, username, s
         'Content-Type': 'application/json'
     }
 
+    content_type = 'HTML' if is_html else 'Text'
+
     email_msg = {
         'message': {
             'subject': subject,
             'body': {
-                'contentType': 'Text',
+                'contentType': content_type,
                 'content': body
             },
             'toRecipients': [{'emailAddress': {'address': email}} for email in to_emails],
+            'ccRecipients': [{'emailAddress': {'address': email}} for email in cc_emails] if cc_emails else [],
+            'bccRecipients': [{'emailAddress': {'address': email}} for email in bcc_emails] if bcc_emails else [],
             'attachments': []
         },
         'saveToSentItems': 'true'
