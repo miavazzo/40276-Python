@@ -13,8 +13,11 @@ def create_app():
     '''
     parte di avvio dell'applicazione
     '''
-    env = config_by_name[os.getenv('FLASK_ENV', 'development')]  # Modifica questa riga
+    config_name = os.getenv('FLASK_ENV', 'production')
+    print(f"Starting app in {config_name} mode")  # Log
+    
     app = Flask(__name__)
-    app.config.from_object(env)
+    app.config.from_object(config_by_name[config_name])  # Usa la configurazione corretta
     app.register_blueprint(routes_bp, url_prefix='/')
+    
     return app

@@ -16,7 +16,7 @@ class Config:
     TENANT_ID = os.getenv('TENANT_ID') #os.environ.get('TENANT_ID')
     USERNAME = os.getenv('APP_USERNAME') #os.environ.get('USERNAME')
     API_KEY = os.getenv('APP_API_KEY') #os.environ.get('API_KEY')
-    ENV = os.getenv('FLASK_ENV', 'development')  # Aggiungi questa riga
+    ENV = os.getenv('FLASK_ENV', 'development')  # development o production
 class DevelopmentConfig(Config):
     '''
     configurazione per ambiente di sviluppo
