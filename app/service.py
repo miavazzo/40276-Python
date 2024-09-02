@@ -3,7 +3,7 @@ import win32service
 import win32event
 import servicemanager
 import socket
-from app import create_app  # Assicurati di importare correttamente la tua applicazione Flask
+from app import create_app  # Assicurati di importare correttamente la tua applicazione Flask da run.py
 
 class AppServerSvc(win32serviceutil.ServiceFramework):
     _svc_name_ = "ArgonOAuth2APIService"
