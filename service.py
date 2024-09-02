@@ -4,7 +4,9 @@ import win32event
 import servicemanager
 import socket
 import logging
-from app import create_app  # Assicurati di importare correttamente la tua applicazione Flask da run.py
+import os
+from dotenv import load_dotenv
+from run import app  # Importa l'applicazione Flask dal file run.py
 
 class AppServerSvc(win32serviceutil.ServiceFramework):
     _svc_name_ = "ArgonOAuth2APIService"
@@ -35,8 +37,15 @@ class AppServerSvc(win32serviceutil.ServiceFramework):
     def main(self):
         logging.info("Service is starting.")
         try:
-            app = create_app()  # Crea l'applicazione Flask
-            app.run()  # Avvia l'applicazione Flask
+            load_dotenv()  # Carica le variabili d'ambiente
+            env = os.getenv('FLASK_ENV', 'development')
+            if env == 'production':
+                from waitress import serve
+                logging.info("Starting the application with Waitress...")
+                serve(app, host='0.0.0.0', port=5000)
+            else:
+                logging.info("Starting the application with Flask development server...")
+                app.run(host='0.0.0.0', port=5000)
         except Exception as e:
             logging.error(f"Error in main: {str(e)}")
             raise
