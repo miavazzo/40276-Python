@@ -116,4 +116,5 @@ def ping():
     '''
     rotta per verificare se l'API è raggiungibile
     '''
+    logging.info("Received request to /ping")
     return jsonify({"message": "API is reachable"}), 200
