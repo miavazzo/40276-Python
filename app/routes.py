@@ -109,3 +109,11 @@ def send_email():
     logging.debug(f"Email sending result: {result}")
 
     return jsonify(result), status_code
+
+# Aggiungo l'endpoint di ping
+@bp.route('/ping', methods=['GET'])
+def ping():
+    '''
+    rotta per verificare se l'API è raggiungibile
+    '''
+    return jsonify({"message": "API is reachable"}), 200
