@@ -19,17 +19,32 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         socket.setdefaulttimeout(60)
         self.is_alive = True
+        self.base_path = os.path.abspath(os.path.dirname(sys.executable))
         self.setup_logging()
+        self.load_environment()
 
     def setup_logging(self):
-        log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+        log_dir = os.path.join(self.base_path, 'logs')
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, 'service.log')
+        
         logging.basicConfig(
             filename=log_file,
             level=logging.DEBUG,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
+        
+        console = logging.StreamHandler()
+        console.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        console.setFormatter(formatter)
+        logging.getLogger('').addHandler(console)
+        
+    def load_environment(self):
+        dotenv_path = os.path.join(self.base_path, '.env')
+        load_dotenv(dotenv_path)
+        logging.info(f"Loaded environment from {dotenv_path}")
+        logging.info(f"API_KEY: {os.getenv('APP_API_KEY')}")
 
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
@@ -46,7 +61,6 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
     def main(self):
         logging.info("Service is starting.")
         try:
-            load_dotenv()  # Carica le variabili d'ambiente
             app = create_app()
             env = os.getenv('FLASK_ENV', 'production')  # Default a 'production' se non specificato
             if env == 'production':
