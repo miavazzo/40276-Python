@@ -10,9 +10,12 @@ from flask import request, jsonify, Blueprint, current_app
 from .email_service import send_email_with_attachments
 
 # Configurazione del logging
+BASE_DIR = r"E:\progetti\email_api_oauth2"
+LOG_FILE = os.path.join(BASE_DIR, 'api_debug.log')
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s',
-                    filename='api_debug.log',
+                    filename=LOG_FILE,
                     filemode='a')
 
 bp = Blueprint('email', __name__)
@@ -32,7 +35,11 @@ def send_email():
     logging.debug(f"Request Headers: {headers}")
 
     api_key = request.headers.get('x-api-key')
-    if api_key != current_app.config['API_KEY']:
+    expected_api_key = current_app.config['API_KEY']
+    logging.debug(f"Received API key: {api_key[:4]}..." if api_key else "No API key received")
+    logging.debug(f"Expected API key: {expected_api_key[:4]}..." if expected_api_key else "No expected API key found in config")
+    
+    if api_key != expected_api_key:
         logging.warning("Unauthorized access attempt")
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -82,7 +89,7 @@ def send_email():
 
     saved_attachments = []
     for i, attachment in enumerate(attachments):
-        attachment_path = f"attachment_{i}"
+        attachment_path = os.path.join(BASE_DIR, f"attachment_{i}")
         try:
             with open(attachment_path, "wb") as f:
                 f.write(base64.b64decode(attachment['content']))
@@ -110,7 +117,6 @@ def send_email():
 
     return jsonify(result), status_code
 
-# Aggiungo l'endpoint di ping
 @bp.route('/ping', methods=['GET'])
 def ping():
     '''
