@@ -1,11 +1,11 @@
-import win32serviceutil
-import win32service
-import win32event
-import servicemanager
 import socket
 import sys
 import logging
 import os
+import win32serviceutil
+import win32service
+import win32event
+import servicemanager
 from dotenv import load_dotenv
 from app import create_app
 
