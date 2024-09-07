@@ -3,7 +3,9 @@ This module provides functionality to send emails with optional attachments
 using the Microsoft Graph API.
 
 Functions:
+    is_valid_email(email): Validates an email address.
     get_access_token(): Retrieves an access token from Microsoft Identity platform.
+    send_email_with_attachments(): Sends an email with optional attachments.
 """
 import base64
 import os
