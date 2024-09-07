@@ -13,10 +13,10 @@ import socket
 import sys
 import logging
 import os
-import win32serviceutil
-import win32service
-import win32event
-import servicemanager
+import win32serviceutil # type: ignore
+import win32service # type: ignore
+import win32event # type: ignore
+import servicemanager # type: ignore
 from dotenv import load_dotenv
 from app import create_app
 
@@ -120,7 +120,7 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
             env = os.getenv('FLASK_ENV', 'production')
             logging.info(f"Running in {env} mode")
             if env == 'production':
-                from waitress import serve
+                from waitress import serve # type: ignore
                 logging.info("Starting the application with Waitress...")
                 serve(app, host='0.0.0.0', port=5000)
             else:
