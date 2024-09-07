@@ -23,6 +23,9 @@ from app import create_app
 BASE_DIR = r"E:\progetti\email_api_oauth2"
 
 class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
+    """
+    classe che definisce il servizio Argon O365 Email API Service
+    """
     _svc_name_ = "ArgonO365EmailAPIService"
     _svc_display_name_ = "Argon O365 Email API Service"
     _svc_description_ = "API per l'invio di email tramite Microsoft Office 365 con autenticazione OAuth2"
@@ -45,42 +48,43 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
         log_dir = os.path.join(BASE_DIR, 'logs')
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, 'service.log')
-        
+
         logging.basicConfig(
             filename=log_file,
             level=logging.DEBUG,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
-        
+
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
-        
+
     def load_environment(self):
         '''
         Carica le variabili d'ambiente da un file .env
         '''
         dotenv_path = os.path.join(BASE_DIR, '.env')
-        logging.info(f"Attempting to load .env from: {dotenv_path}")
+        logging.info("Attempting to load .env from: %s", dotenv_path)
         if os.path.exists(dotenv_path):
             load_dotenv(dotenv_path)
-            logging.info(f"Loaded environment from {dotenv_path}")
+            logging.info("Loaded environment from %s", dotenv_path)
 
             # Verifica esplicita per APP_API_KEY
             api_key = os.getenv('APP_API_KEY')
             if api_key:
-                logging.info(f"APP_API_KEY loaded successfully. First 4 characters: {api_key[:4]}...")
+                logging.info("APP_API_KEY loaded successfully. First 4 characters: %s...", api_key[:4])
             else:
                 logging.error("APP_API_KEY not found in .env file")
 
             # Log di tutte le variabili d'ambiente caricate (escludi valori sensibili)
             env_vars = dict(os.environ)
-            safe_env_vars = {k: v[:4] + '...' if k in ['APP_API_KEY', 'CLIENT_SECRET'] else v for k, v in env_vars.items()}
-            logging.debug(f"Loaded environment variables: {safe_env_vars}")
+            safe_env_vars = {k: v[:4] + '...' if k in ['APP_API_KEY', 'CLIENT_SECRET'] else v for k,
+                             v in env_vars.items()}
+            logging.debug("Loaded environment variables: %s", safe_env_vars)
         else:
-            logging.error(f".env file not found at {dotenv_path}")
+            logging.error(".env file not found at %s", dotenv_path)
 
     def SvcStop(self):
         '''
@@ -107,7 +111,7 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
         logging.info("Service is starting.")
         try:
             app = create_app()
-            
+
             # Verifica aggiuntiva per APP_API_KEY
             if 'API_KEY' not in app.config or not app.config['API_KEY']:
                 logging.error("APP_API_KEY not found in app configuration")
@@ -123,7 +127,7 @@ class ArgonO365EmailAPIService(win32serviceutil.ServiceFramework):
                 logging.info("Starting the application with Flask development server...")
                 app.run(host='0.0.0.0', port=5000)
         except Exception as e:
-            logging.error(f"Error in main: {str(e)}")
+            logging.error("Error in main: %s", e)
             self.SvcStop()
 
 if __name__ == '__main__':
@@ -133,4 +137,3 @@ if __name__ == '__main__':
         servicemanager.StartServiceCtrlDispatcher()
     else:
         win32serviceutil.HandleCommandLine(ArgonO365EmailAPIService)
- 
