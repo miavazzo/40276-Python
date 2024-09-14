@@ -22,6 +22,23 @@ from app import create_app
 from waitress import serve
 import threading
 
+def find_dotenv():
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'),  # Stessa directory dello script su macchina di sviluppo
+        r"e:\progetti\email_api_oauth2\.env"  # Percorso sulla macchina remota
+    ]
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    return None
+
+dotenv_path = find_dotenv()
+if dotenv_path:
+    load_dotenv(dotenv_path)
+    print(f"Loaded .env from {dotenv_path}")
+else:
+    print("No .env file found")
+
 class APIService(win32serviceutil.ServiceFramework):
     _svc_name_ = "ArgonO365EmailAPIService"
     _svc_display_name_ = "Argon O365 Email API Service"
@@ -48,13 +65,20 @@ class APIService(win32serviceutil.ServiceFramework):
 
     def main(self):
         # Setup logging
-        logging.basicConfig(filename='E:\\progetti\\email_api_oauth2\\api_service.log',
-                            level=logging.INFO,
+        log_dir = r'e:\progetti\email_api_oauth2\logs'
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = os.path.join(log_dir, 'api_service.log')
+        logging.basicConfig(filename=log_file,
+                            level=logging.DEBUG,
                             format='%(asctime)s - %(levelname)s - %(message)s')
 
         try:
-            # Load environment variables
-            load_dotenv()
+            # Verifica se l'API_KEY è stata caricata
+            api_key = os.getenv('APP_API_KEY')
+            if api_key:
+                logging.info("API_KEY loaded successfully")
+            else:
+                logging.error("Failed to load API_KEY from .env file")
 
             # Create the app
             app = create_app()
