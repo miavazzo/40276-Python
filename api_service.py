@@ -20,6 +20,7 @@ import logging
 from dotenv import load_dotenv
 from app import create_app
 from waitress import serve
+import threading
 
 class APIService(win32serviceutil.ServiceFramework):
     _svc_name_ = "ArgonO365EmailAPIService"
@@ -29,16 +30,20 @@ class APIService(win32serviceutil.ServiceFramework):
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
+        self.is_running = False
         socket.setdefaulttimeout(60)
 
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.hWaitStop)
+        self.is_running = False
+        logging.info('Service is stopping.')
 
     def SvcDoRun(self):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                               servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
+        self.is_running = True
         self.main()
 
     def main(self):
@@ -51,12 +56,29 @@ class APIService(win32serviceutil.ServiceFramework):
             # Load environment variables
             load_dotenv()
 
-            # Create and run the app
+            # Create the app
             app = create_app()
-            logging.info("Starting the application with Waitress...")
-            serve(app, host='0.0.0.0', port=5000)
+
+            # Run the app in a separate thread
+            def run_server():
+                logging.info("Starting the application with Waitress...")
+                serve(app, host='0.0.0.0', port=5000)
+
+            server_thread = threading.Thread(target=run_server)
+            server_thread.start()
+
+            # Main service loop
+            while self.is_running:
+                rc = win32event.WaitForSingleObject(self.hWaitStop, 5000)
+                if rc == win32event.WAIT_OBJECT_0:
+                    # Stop signal received
+                    break
+
+            logging.info("Service is shutting down.")
         except Exception as e:
             logging.error(f"Error in main: {str(e)}", exc_info=True)
+        finally:
+            self.is_running = False
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
